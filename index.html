@@ -7,7 +7,6 @@ body{margin:0;}
 .bpw-powered{display:none!important;}
 </style>
 </head>
-
 <body>
 
 <div id="webchat"></div>
@@ -15,9 +14,17 @@ body{margin:0;}
 <script src="https://cdn.botpress.cloud/webchat/v3.5/inject.js"></script>
 
 <script>
-window.botpressWebChat.init({
-  botId: "20250920104924-XYP4SJV4",
-  container: "#webchat"
+document.addEventListener("DOMContentLoaded", function () {
+  if (window.botpressWebChat) {
+    window.botpressWebChat.init({
+      botId: "20250920104924-XYP4SJV4",
+      container: "#webchat",
+      hostUrl: "https://cdn.botpress.cloud/webchat/v3.5",
+      showPoweredBy: false
+    });
+  } else {
+    console.error("Botpress WebChat failed to load");
+  }
 });
 </script>
 
