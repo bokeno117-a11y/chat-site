@@ -1,37 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <style>
-    body { margin:0; }
-    .bpw-header,
-    .bpw-powered,
-    .bpw-footer {
-      display:none !important;
-    }
-  </style>
+<meta charset="UTF-8" />
+<style>
+body{margin:0;}
+.bpw-powered{display:none!important;}
+</style>
 </head>
 
 <body>
 
-<div id="webchat"></div>
-
 <script src="https://cdn.botpress.cloud/webchat/v1/inject.js"></script>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  if (!window.__bpLoaded) {
-    window.__bpLoaded = true;
-
-    window.botpressWebChat.init({
-      botId: "20250920104924-XYP4SJV4",
-      hostUrl: "https://cdn.botpress.cloud/webchat/v1",
-      containerWidth: "100%",
-      layoutWidth: "100%",
-      hideWidget: false,
-      showPoweredBy: false
-    });
-  }
+window.botpressWebChat.init({
+  botId: "20250920104924-XYP4SJV4"
 });
 </script>
 
