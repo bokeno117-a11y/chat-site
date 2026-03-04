@@ -1,7 +1,6 @@
 export default {
   async fetch(request, env) {
 
-    // ✅ CORS対応
     if (request.method === "OPTIONS") {
       return new Response(null, {
         headers: {
@@ -19,7 +18,7 @@ export default {
     const { message, conversationId } = await request.json();
 
     const botpressResponse = await fetch(
-      "https://api.botpress.cloud/v1/chat/completions",
+      "https://api.botpress.cloud/v1/chat",
       {
         method: "POST",
         headers: {
@@ -29,15 +28,17 @@ export default {
         body: JSON.stringify({
           botId: "3ea5980e-cd88-4245-ba2e-efcf468c8a22",
           conversationId: conversationId || crypto.randomUUID(),
-          messages: [
-            { role: "user", content: message }
-          ]
+          type: "text",
+          text: message
         })
       }
     );
 
     const data = await botpressResponse.json();
-    const reply = data.choices?.[0]?.message?.content || "エラーが発生しました";
+
+    const reply =
+      data?.responses?.[0]?.payload?.text ||
+      "エラーが発生しました";
 
     return new Response(
       JSON.stringify({ reply }),
