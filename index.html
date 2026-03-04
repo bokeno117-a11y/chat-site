@@ -1,75 +1,52 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Chat</title>
-<style>
-body { font-family: Arial; background:#f5f5f5; margin:0; }
-#chat {
-  max-width:600px;
-  margin:40px auto;
-  background:white;
-  padding:20px;
-  border-radius:10px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.1);
-  height:400px;
-  overflow-y:auto;
-}
-.msg { margin:10px 0; }
-.user { text-align:right; }
-.bot { text-align:left; color:#0077ff; }
-#inputArea {
-  max-width:600px;
-  margin:10px auto;
-  display:flex;
-}
-#input {
-  flex:1;
-  padding:10px;
-  font-size:16px;
-}
-button {
-  padding:10px 20px;
-  font-size:16px;
-}
-</style>
-</head>
-<body>
+export default {
+  async fetch(request, env) {
 
-<div id="chat"></div>
+    // ✅ CORS対応
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type"
+        }
+      });
+    }
 
-<div id="inputArea">
-  <input id="input" placeholder="メッセージを入力">
-  <button onclick="send()">送信</button>
-</div>
+    if (request.method !== "POST") {
+      return new Response("Method Not Allowed", { status: 405 });
+    }
 
-<script>
-let conversationId = localStorage.getItem("cid") || crypto.randomUUID();
-localStorage.setItem("cid", conversationId);
+    const { message, conversationId } = await request.json();
 
-async function send(){
-  const input = document.getElementById("input");
-  const message = input.value;
-  if(!message) return;
+    const botpressResponse = await fetch(
+      "https://api.botpress.cloud/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${env.BOTPRESS_API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          botId: "3ea5980e-cd88-4245-ba2e-efcf468c8a22",
+          conversationId: conversationId || crypto.randomUUID(),
+          messages: [
+            { role: "user", content: message }
+          ]
+        })
+      }
+    );
 
-  const chat = document.getElementById("chat");
+    const data = await botpressResponse.json();
+    const reply = data.choices?.[0]?.message?.content || "エラーが発生しました";
 
-  chat.innerHTML += `<div class="msg user">${message}</div>`;
-  input.value = "";
-  chat.scrollTop = chat.scrollHeight;
-
-  const res = await fetch("https://restless-cloud-eec4.bokeno117.workers.dev", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message, conversationId })
-  });
-
-  const data = await res.json();
-
-  chat.innerHTML += `<div class="msg bot">${data.reply}</div>`;
-  chat.scrollTop = chat.scrollHeight;
-}
-</script>
-
-</body>
-</html>
+    return new Response(
+      JSON.stringify({ reply }),
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*"
+        }
+      }
+    );
+  }
+};
