@@ -2,73 +2,133 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Chat</title>
+<title>AI Chat</title>
+
 <style>
-body { font-family: Arial; background:#f5f5f5; margin:0; }
-#chat {
-  max-width:600px;
-  margin:40px auto;
-  background:white;
-  padding:20px;
-  border-radius:10px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.1);
-  height:400px;
-  overflow-y:auto;
+
+body{
+margin:0;
+font-family:Arial;
+background:#343541;
+color:white;
 }
-.msg { margin:10px 0; }
-.user { text-align:right; }
-.bot { text-align:left; color:#0077ff; }
-#inputArea {
-  max-width:600px;
-  margin:10px auto;
-  display:flex;
+
+#chat{
+max-width:900px;
+margin:auto;
+padding:20px;
+min-height:80vh;
 }
-#input {
-  flex:1;
-  padding:10px;
-  font-size:16px;
+
+.msg{
+padding:12px 16px;
+margin:10px 0;
+border-radius:8px;
+max-width:70%;
 }
-button {
-  padding:10px 20px;
-  font-size:16px;
+
+.user{
+background:#0b93f6;
+margin-left:auto;
 }
+
+.bot{
+background:#444654;
+}
+
+#inputArea{
+position:fixed;
+bottom:0;
+width:100%;
+background:#40414f;
+padding:15px;
+display:flex;
+justify-content:center;
+}
+
+#inputWrap{
+max-width:900px;
+width:100%;
+display:flex;
+}
+
+#input{
+flex:1;
+padding:12px;
+border-radius:6px;
+border:none;
+font-size:16px;
+}
+
+button{
+margin-left:10px;
+padding:12px 20px;
+background:#19c37d;
+border:none;
+border-radius:6px;
+color:white;
+font-size:16px;
+cursor:pointer;
+}
+
 </style>
 </head>
+
 <body>
 
 <div id="chat"></div>
 
 <div id="inputArea">
-  <input id="input" placeholder="メッセージを入力">
-  <button onclick="send()">送信</button>
+<div id="inputWrap">
+<input id="input" placeholder="メッセージを入力">
+<button onclick="send()">送信</button>
+</div>
 </div>
 
 <script>
-let conversationId = localStorage.getItem("cid") || crypto.randomUUID();
+
+let conversationId =
+localStorage.getItem("cid") || crypto.randomUUID();
+
 localStorage.setItem("cid", conversationId);
 
 async function send(){
-  const input = document.getElementById("input");
-  const message = input.value;
-  if(!message) return;
 
-  const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+const message = input.value;
 
-  chat.innerHTML += `<div class="msg user">${message}</div>`;
-  input.value = "";
-  chat.scrollTop = chat.scrollHeight;
+if(!message) return;
 
-  const res = await fetch("https://restless-cloud-eec4.bokeno117.workers.dev", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message, conversationId })
-  });
+const chat = document.getElementById("chat");
 
-  const data = await res.json();
+chat.innerHTML += `<div class="msg user">${message}</div>`;
 
-  chat.innerHTML += `<div class="msg bot">${data.reply}</div>`;
-  chat.scrollTop = chat.scrollHeight;
+input.value="";
+
+chat.scrollTop = chat.scrollHeight;
+
+const res = await fetch(
+"https://restless-cloud-eec4.bokeno117.workers.dev",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+message,
+conversationId
+})
 }
+);
+
+const data = await res.json();
+
+chat.innerHTML += `<div class="msg bot">${data.reply}</div>`;
+
+chat.scrollTop = chat.scrollHeight;
+
+}
+
 </script>
 
 </body>
