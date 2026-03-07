@@ -88,20 +88,16 @@ cursor:pointer;
 
 <script>
 
-console.log("chat script loaded");
-
-/* conversationId 作成（安全版） */
+const BOT_TOKEN = "YOUR_BOTPRESS_TOKEN";
 
 let conversationId = localStorage.getItem("cid");
 
 if(!conversationId){
-conversationId = Math.random().toString(36).substring(2);
+conversationId = crypto.randomUUID();
 localStorage.setItem("cid", conversationId);
 }
 
 async function send(){
-
-console.log("send called");
 
 const input = document.getElementById("input");
 const message = input.value;
@@ -110,45 +106,60 @@ if(!message) return;
 
 const chat = document.getElementById("chat");
 
-/* ユーザーメッセージ表示 */
-
 chat.innerHTML += `<div class="msg user">${message}</div>`;
 
 input.value="";
-
 chat.scrollTop = chat.scrollHeight;
 
-try{
-
-const res = await fetch(
-"https://restless-cloud-eec4.bokeno117.workers.dev",
+await fetch(
+`https://api.botpress.cloud/v1/chat/conversations/${conversationId}/messages`,
 {
 method:"POST",
 headers:{
+"Authorization":`Bearer ${BOT_TOKEN}`,
 "Content-Type":"application/json"
 },
 body:JSON.stringify({
-message,
-conversationId
+type:"text",
+text:message
 })
 }
 );
 
-const data = await res.json();
+let reply=null;
 
-/* Botメッセージ表示 */
+for(let i=0;i<8;i++){
 
-chat.innerHTML += `<div class="msg bot">${data.reply}</div>`;
+await new Promise(r=>setTimeout(r,1200));
 
-chat.scrollTop = chat.scrollHeight;
+const res=await fetch(
+`https://api.botpress.cloud/v1/chat/conversations/${conversationId}/messages`,
+{
+headers:{
+"Authorization":`Bearer ${BOT_TOKEN}`
+}
+}
+);
 
-}catch(e){
+const data=await res.json();
 
-console.error("fetch error",e);
+const botMessage=[...(data.messages||[])]
+.reverse()
+.find(m=>m.author==="bot");
 
-chat.innerHTML += `<div class="msg bot">接続エラーが発生しました</div>`;
+if(botMessage?.payload?.text){
+reply=botMessage.payload.text;
+break;
+}
 
 }
+
+if(!reply){
+reply="返信が取得できませんでした";
+}
+
+chat.innerHTML+=`<div class="msg bot">${reply}</div>`;
+chat.scrollTop=chat.scrollHeight;
 
 }
 
