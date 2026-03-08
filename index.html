@@ -3,166 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <title>AI Chat</title>
-
-<style>
-
-body{
-margin:0;
-font-family:Arial;
-background:#343541;
-color:white;
-}
-
-#chat{
-max-width:900px;
-margin:auto;
-padding:20px;
-min-height:80vh;
-overflow-y:auto;
-}
-
-.msg{
-padding:12px 16px;
-margin:10px 0;
-border-radius:8px;
-max-width:70%;
-}
-
-.user{
-background:#0b93f6;
-margin-left:auto;
-}
-
-.bot{
-background:#444654;
-}
-
-#inputArea{
-position:fixed;
-bottom:0;
-width:100%;
-background:#40414f;
-padding:15px;
-display:flex;
-justify-content:center;
-}
-
-#inputWrap{
-max-width:900px;
-width:100%;
-display:flex;
-}
-
-#input{
-flex:1;
-padding:12px;
-border-radius:6px;
-border:none;
-font-size:16px;
-}
-
-button{
-margin-left:10px;
-padding:12px 20px;
-background:#19c37d;
-border:none;
-border-radius:6px;
-color:white;
-font-size:16px;
-cursor:pointer;
-}
-
-</style>
 </head>
 
 <body>
 
-<div id="chat"></div>
-
-<div id="inputArea">
-<div id="inputWrap">
-<input id="input" placeholder="メッセージを入力">
-<button onclick="send()">送信</button>
-</div>
-</div>
+<script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
 
 <script>
-
-const BOT_TOKEN = "YOUR_BOTPRESS_TOKEN";
-
-let conversationId = localStorage.getItem("cid");
-
-if(!conversationId){
-conversationId = crypto.randomUUID();
-localStorage.setItem("cid", conversationId);
-}
-
-async function send(){
-
-const input = document.getElementById("input");
-const message = input.value;
-
-if(!message) return;
-
-const chat = document.getElementById("chat");
-
-chat.innerHTML += `<div class="msg user">${message}</div>`;
-
-input.value="";
-chat.scrollTop = chat.scrollHeight;
-
-await fetch(
-`https://api.botpress.cloud/v1/chat/conversations/${conversationId}/messages`,
-{
-method:"POST",
-headers:{
-"Authorization":`Bearer ${BOT_TOKEN}`,
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-type:"text",
-text:message
+window.botpressWebChat.init({
+configUrl:"ここにconfigUrl"
 })
-}
-);
-
-let reply=null;
-
-for(let i=0;i<8;i++){
-
-await new Promise(r=>setTimeout(r,1200));
-
-const res=await fetch(
-`https://api.botpress.cloud/v1/chat/conversations/${conversationId}/messages`,
-{
-headers:{
-"Authorization":`Bearer ${BOT_TOKEN}`
-}
-}
-);
-
-const data=await res.json();
-
-const botMessage=[...(data.messages||[])]
-.reverse()
-.find(m=>m.author==="bot");
-
-if(botMessage?.payload?.text){
-reply=botMessage.payload.text;
-break;
-}
-
-}
-
-if(!reply){
-reply="返信が取得できませんでした";
-}
-
-chat.innerHTML+=`<div class="msg bot">${reply}</div>`;
-chat.scrollTop=chat.scrollHeight;
-
-}
-
 </script>
 
 </body>
