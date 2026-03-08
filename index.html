@@ -7,12 +7,21 @@
 
 <body>
 
+<div id="webchat"></div>
+
 <script src="https://cdn.botpress.cloud/webchat/v3.3/inject.js"></script>
 
 <script>
+
+window.addEventListener("load", function () {
+
 window.botpressWebChat.init({
-configUrl:"https://files.bpcontent.cloud/2025/09/20/10/20250920104924-XYP4SJV4.json"
-})
+configUrl: "https://files.bpcontent.cloud/2025/09/20/10/20250920104924-XYP4SJV4.json",
+container: "#webchat"
+});
+
+});
+
 </script>
 
 </body>
