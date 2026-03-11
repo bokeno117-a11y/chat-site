@@ -18,6 +18,7 @@ max-width:900px;
 margin:auto;
 padding:20px;
 min-height:80vh;
+overflow-y:auto;
 }
 
 .msg{
@@ -57,6 +58,7 @@ flex:1;
 padding:12px;
 border:none;
 border-radius:6px;
+font-size:16px;
 }
 
 button{
@@ -66,6 +68,8 @@ background:#19c37d;
 border:none;
 border-radius:6px;
 color:white;
+font-size:16px;
+cursor:pointer;
 }
 
 </style>
@@ -84,26 +88,32 @@ color:white;
 
 <script>
 
+// 会話ID生成
 let conversationId =
 localStorage.getItem("cid") || crypto.randomUUID()
 
-localStorage.setItem("cid",conversationId)
+localStorage.setItem("cid", conversationId)
 
 async function send(){
 
-const input=document.getElementById("input")
-const message=input.value
+const input = document.getElementById("input")
+const message = input.value
 
 if(!message) return
 
-const chat=document.getElementById("chat")
+const chat = document.getElementById("chat")
 
+// ユーザー表示
 chat.innerHTML += `<div class="msg user">${message}</div>`
 
 input.value=""
 
+chat.scrollTop = chat.scrollHeight
+
+try{
+
 const res = await fetch(
-"ここにWorkerURL",
+"https://chat-api.bokeno117.workers.dev",
 {
 method:"POST",
 headers:{
@@ -118,7 +128,16 @@ conversationId
 
 const data = await res.json()
 
+// Bot表示
 chat.innerHTML += `<div class="msg bot">${data.reply}</div>`
+
+chat.scrollTop = chat.scrollHeight
+
+}catch(e){
+
+chat.innerHTML += `<div class="msg bot">接続エラーが発生しました</div>`
+
+}
 
 }
 
