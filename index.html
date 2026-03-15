@@ -15,19 +15,23 @@ background:#343541;
 
 <body>
 
-<script src="https://cdn.botpress.cloud/webchat/v2/inject.js"></script>
+<script src="https://cdn.botpress.cloud/webchat/v3.0/inject.js"></script>
 
 <script>
 
-window.botpressWebChat.init({
+window.botpress.on("webchat:ready", () => {
 
-botId: "20250920104924-XYP4SJV4",
-clientId: "20250920104924-XYP4SJV4",
+  window.botpress.open()
 
-hostUrl: "https://cdn.botpress.cloud/webchat/v2",
-messagingUrl: "https://messaging.botpress.cloud",
+})
 
-showPoweredBy: false
+window.botpress.init({
+
+  botId: "20250920104924-XYP4SJV4",
+
+  configuration: {
+    botName: "AI人事担当"
+  }
 
 })
 
